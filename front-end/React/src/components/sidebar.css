@@ -1,0 +1,11 @@
+.sidebar-menu {
+  font-family: "Poppins", sans-serif;
+}
+
+.menu-item {
+  transition: all 0.25s ease-in-out;
+}
+
+.menu-item:hover {
+  transform: translateX(4px);
+}

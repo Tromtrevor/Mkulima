@@ -1,0 +1,100 @@
+.sidebar-menu {
+  width: 100%;
+  max-width: 300px;
+  min-height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  font-family: "Poppins", sans-serif;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-menu .status-bar {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 1rem;
+  background: #f4f6f9;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.sidebar-menu .profile-section img {
+  border-radius: 50%;
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  margin-top: 1.5rem;
+  border: 3px solid #2f855a;
+  animation: fade-in 0.8s ease;
+}
+
+.sidebar-menu .text-wrapper {
+  font-weight: 600;
+  color: #2f855a;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.sidebar-menu .menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  color: #1b1b1b;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar-menu .menu-item:hover {
+  background-color: #f0fdf4;
+  color: #276749;
+}
+
+.sidebar-menu .logout-section {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e53e3e;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-menu .logout-section:hover {
+  opacity: 0.8;
+}
+
+/* Hosted Figma images */
+.line {
+  background: url("https://codia-f2c.s3.us-west-1.amazonaws.com/image/2025-11-07/line2.svg")
+    no-repeat center;
+}
+.line-2 {
+  background: url("https://codia-f2c.s3.us-west-1.amazonaws.com/image/2025-11-07/line3.svg")
+    no-repeat center;
+}
+.mask-group {
+  background: url("https://codia-f2c.s3.us-west-1.amazonaws.com/image/2025-11-07/maskgroup.png")
+    no-repeat center;
+  background-size: cover;
+}
+.levels {
+  background: url("https://codia-f2c.s3.us-west-1.amazonaws.com/image/2025-11-07/levels.png")
+    no-repeat center;
+  background-size: contain;
+}
+
+/* Title */
+.sidebar-menu .title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2f855a;
+  margin: 1rem 0;
+  padding-left: 1.2rem;
+}

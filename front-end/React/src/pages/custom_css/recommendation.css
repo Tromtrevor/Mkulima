@@ -1,0 +1,227 @@
+.rec-container {
+  min-height: 100vh;
+  background-color: #f2f0ef;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  position: relative;
+  font-family: "Poppins", sans-serif;
+}
+
+/* --- Top Bar --- */
+.rec-time-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+  margin-bottom: 24px;
+}
+
+.rec-time-box p {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000;
+}
+
+.rec-box {
+  width: 120px;
+  height: 36px;
+  border-radius: 40px;
+  background-color: #000;
+}
+
+.rec-time-box img {
+  width: 20px;
+  height: auto;
+}
+
+/* --- Title Row --- */
+.rec-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  margin-bottom: 20px;
+}
+
+.rec-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rec-logo img:first-child {
+  width: 15px;
+  height: 29px;
+  margin-left: 60px;
+}
+
+.rec-logo img:nth-child(2) {
+  width: 70px;
+  height: 1px;
+}
+
+.rec-logo p {
+  color: #21a85e;
+  font-size: 19px;
+  margin: 4px 0 0;
+  font-weight: 600;
+}
+
+.rec-A {
+  color: #21a85e;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.rec-right-icon {
+  width: 35px;
+  height: 20px;
+}
+
+/* --- Body --- */
+.rec-body {
+  width: 90%;
+  background: linear-gradient(to bottom, #ffffff, #30a64d00);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 10px #00000020;
+}
+
+.rec-top-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 12px;
+}
+
+.rec-location {
+  font-size: 15px;
+  color: #000;
+  margin-bottom: 12px;
+}
+
+.rec-heading {
+  color: #229e47;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* --- Cards --- */
+.rec-card {
+  background-color: #ffffffaa;
+  border-radius: 10px;
+  padding: 10px 20px;
+  margin-bottom: 16px;
+}
+
+.rec-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background-color: #21a85e2b;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.rec-card-header img {
+  width: 54px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.rec-card-header h3 {
+  color: #000;
+  font-size: 28px;
+  text-transform: capitalize;
+}
+
+.rec-card p {
+  color: #000;
+  font-size: 16px;
+  margin: 2px 0;
+}
+
+/* --- Selection Section --- */
+.rec-selection-box {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px #00000010;
+}
+
+.rec-selection-box label {
+  font-weight: 600;
+  font-size: 16px;
+  color: #000;
+}
+
+.rec-selection-box select {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  outline: none;
+  font-size: 15px;
+}
+
+.rec-selection-box button {
+  width: 100%;
+  margin-top: 16px;
+  background-color: #229e47;
+  color: white;
+  border: none;
+  padding: 12px;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.rec-selection-box button:hover {
+  background-color: #1b803a;
+}
+
+/* --- Bottom Bar --- */
+.rec-bottom-bar {
+  position: absolute;
+  bottom: 8px;
+  width: 150px;
+  height: 5px;
+  background-color: #000;
+  border-radius: 100px;
+  opacity: 0.3;
+}
+
+/* --- No Result --- */
+.no-result {
+  justify-content: center;
+  text-align: center;
+}
+
+.no-result h2 {
+  font-size: 22px;
+  color: #444;
+  margin-bottom: 12px;
+}
+
+.no-result button {
+  background-color: #229e47;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.no-result button:hover {
+  background-color: #1b803a;
+}

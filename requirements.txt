@@ -1,0 +1,10 @@
+streamlit
+joblib
+pandas
+geopandas
+shapely
+requests
+plotly
+datetime
+scikit-learn
+pathlib
