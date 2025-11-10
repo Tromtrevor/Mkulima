@@ -11,7 +11,7 @@ const AnalysisResults = () => {
   const farm_size = location.state?.farm_size;   
 
   const handleProceed = () => {
-    navigate("/home"); // ✅ goes to your homepage
+    navigate("/report");
   };
 
   const handleBack = () => {
@@ -117,7 +117,7 @@ const AnalysisResults = () => {
           onClick={handleProceed}
           className="green-btn w-full py-3 font-semibold text-white rounded-lg shadow-md transition-transform hover:scale-105"
         >
-          PROCEED
+          GENERATE REPORT
         </button>
       </div>
 

@@ -1,46 +1,77 @@
+import json
 from .groq_client import client
 
+
+
 def generate_crop_insight(data):
+
+    latest = data.get("latest", {})
+    profit_analysis = data.get("profit_analysis", {})
+
     prompt = f"""
-    County: {data.get('latest')['county']}
-    Farm Size: {data.get('latest')['farm_size']} acres
-    Crop: {data.get('profit_analysis')['crop']}
+    County: {latest['county']}
+    Farm Size: {latest['farm_size']} acres
+    Crop: {profit_analysis['crop']}
 
-    Soil pH: {data.get('latest')['input_data']['pH']}
-    Average Rainfall: {data.get('latest')['input_data']['Precipitation']} mm/year
-    Average Temperature: {data.get('latest')['input_data']['mean Tmin']} °C
-    Average Temperature: {data.get('latest')['input_data']['mean Tmax']} °C    
+    Soil pH: {latest['input_data']['pH']}
+    Average Rainfall: {latest['input_data']['Precipitation']} mm/year
+    Average Temperature (Min): {latest['input_data']['mean Tmin']} °C
+    Average Temperature (Max): {latest['input_data']['mean Tmax']} °C    
     
-    
-
     Predicted Yield: {data.get('profit_analysis')['predicted_yield']} t/acre
-    Market Price: KES {data.get('profit_analysis')['market_price']} per acre
+    Market Price: KES {data.get('profit_analysis')['market_price']} per bag
     Estimated Profit: KES {data.get('profit_analysis')['profit']['total_profit']}
-    Profit Margin: {data.get('profit_analysis')['profit_margin']}
+    Profit Margin: {data.get('profit_analysis')['profit_margin']}%
 
-	Using the above data, provide a detailed analysis including:
-	1. Expected Yield and Profitability
-	2. Soil and Fertilizer Recommendations
-	3. Climate and Water Management Advice
-	4. Market and Pricing Outlook
-	5. Final Recommendation for the Farmer
+    Provide analysis in valid JSON format with these exact keys:
+    {{
+        "insight": "1-2 sentence main takeaway about profitability and viability",
+        "recommendations": ["recommendation 1", "recommendation 2", "recommendation 3", "recommendation 4"],
+        "warnings": ["warning 1", "warning 2"],
+        "market_trends": "Brief market outlook for this crop in this region",
+        "best_practices": ["practice 1", "practice 2", "practice 3"],
+        "roi_info": "Expected return on investment and timeline",
+        "notes": "Any additional considerations or intercropping suggestions"
+    }}
 
-	Reccomdend intercropping on a farm size thet can handle it. ALos take into consideration the nitrogen, phosphorous and potassium levels, giving only two crops that help boost the insufficient one.
-
-	Use clear and short sentences suitable for an agricultural app interface. Keep it short and straight to the point. You acn ignore the format but give relevant information. 250 words
-	"""
+    Guidelines:
+    - Keep all text SHORT and PRACTICAL for farmers
+    - Recommendations should be actionable
+    - Suggest intercropping if farm size allows (>{data.get('latest')['farm_size']} acres)
+    - Consider N-P-K levels for intercrop suggestions
+    - Warnings should highlight risks
+    - Best practices should be region-specific to {data.get('latest')['county']}
+    - Use local context and Kenyan agricultural practices
+    - Response MUST be valid JSON only, no markdown or extra text
+    """
+    
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
-        {
-            "role": "system",
-            "content": (
-            "You are an expert agronomist and data analyst. "
-            "Your job is to analyze agricultural data for Kenyan counties "
-            "and give structured, practical insights for smallholder farmers."
-        )},
+            {
+                "role": "system",
+                "content": (
+                    "You are an expert agronomist for Kenyan smallholder farmers. "
+                    "Provide structured, actionable agricultural insights. "
+                    "Always respond with valid JSON only."
+                )
+            },
             {"role": "user", "content": prompt},
         ],
     )
 
-    return response.choices[0].message.content
+    try:
+        # Parse the JSON response
+        insight_data = json.loads(response.choices[0].message.content)
+        return {"Insights": insight_data}
+    except json.JSONDecodeError:
+        # Fallback if response isn't valid JSON
+        return {
+            "insight": response.choices[0].message.content,
+            "recommendations": [],
+            "warnings": [],
+            "market_trends": "Market data unavailable",
+            "best_practices": [],
+            "roi_info": "ROI data unavailable",
+            "notes": ""
+        }
