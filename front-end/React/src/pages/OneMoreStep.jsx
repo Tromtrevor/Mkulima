@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./custom_css/onemorestep.css";
 
@@ -7,15 +6,33 @@ export default function OneMoreStep() {
   const { state } = useLocation();
   const { county, farm_size, chosenCrop } = state || {};
 
-  const handleDefault = () => {
+const handleDefault = async () => {
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/crop/calculate-default-profit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json" },
+      body: JSON.stringify({
+        crop_name: chosenCrop.crop,
+      }),
+    });
+
+    const responseText = await response.text();
+    const data = JSON.parse(responseText);
+
     navigate("/profit", {
       state: {
+        result: data,
+        crop: chosenCrop,
         county: county,
         farm_size: farm_size,
-        crop: chosenCrop,
-        useDefaults: true },
+      },
     });
-  };
+  } catch (err) {
+    console.error("Error:", err);
+    alert("Failed to calculate default profit analysis");
+  }
+};
 
   const handleCustom = () => {
     navigate("/farm-inputs", {

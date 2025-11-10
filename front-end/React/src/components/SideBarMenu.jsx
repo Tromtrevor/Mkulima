@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./sidebar.css"; // Fixed path - assuming same directory
 import {
-  Home,
-  Map,
-  Sprout,
+  NotebookText,
+  MapPin,
+  MessageCircleQuestionMark,
   LogOut,
-  BookOpen,
+  BookText,
   Menu,
   X,
+  Info,
+  Bell,
 } from "lucide-react";
 
 const IMAGES = {
@@ -21,10 +23,12 @@ const SidebarMenu = () => {
   const [isOpen, setIsOpen] = useState(true);
 
   const menuItems = [
-    { icon: <Home className="w-5 h-5" />, label: "Reports", path: "/report" },
-    { icon: <Sprout className="w-5 h-5" />, label: "Farm Inputs", path: "/farm-inputs" },
-    { icon: <BookOpen className="w-5 h-5" />, label: "Recommendation", path: "/recommendation" },
-    { icon: <Map className="w-5 h-5" />, label: "Select Crop", path: "/selection" },
+    { icon: <Bell className="w-5 h-4" />, label: "Notifications", path: "/notifications" },
+    { icon: <BookText className="w-5 h-4" />, label: "Reports", path: "/report" },
+    { icon: <Info className="w-5 h-4" />, label: "Information", path: "/information" },
+    { icon: <MapPin className="w-5 h-4" />, label: "AgroMap", path: "/agromap" },
+    { icon: <NotebookText className="w-5 h-4" />, label: "About Us", path: "/about-us" },
+    { icon: <MessageCircleQuestionMark className="w-5 h-4" />, label: "FAQ", path: "/faq" },
   ];
 
   const handleLogout = () => {

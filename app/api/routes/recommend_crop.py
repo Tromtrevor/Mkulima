@@ -26,11 +26,14 @@ class CropRequest(BaseModel):
     county: str
     farm_size: float
 
-class CropSelection(BaseModel):
+class CropSelectionOwn(BaseModel):
     crop_name: str
     seed_cost_per_acre: Optional[float] = None
     fertilizer_cost_per_acre: Optional[float] = None
     labor_cost_per_acre: Optional[float] = None
+
+class CropSelectionDefault(BaseModel):
+    crop_name: str
 
 class ChatRequest(BaseModel):
     message: str
@@ -63,7 +66,7 @@ def predict_yield(request: CropRequest):
     "county": location,
     "farm_size": farm_size,
     "predictions": predictions,
-    #"input_data": data.to_dict(orient="records")[0],
+    "input_data": data.to_dict(orient="records")[0],
     }
 
     return {
@@ -71,8 +74,8 @@ def predict_yield(request: CropRequest):
     "data": prediction_cache["latest"],
     }
 
-@router.post("/crop/calculate-profit")
-def calculate_profit_endpoint(request: CropSelection):
+@router.post("/crop/calculate-own-profit")
+def calculate_own_profit(request: CropSelectionOwn):
     cache = prediction_cache.get('latest')
     
     if not cache:
@@ -94,14 +97,18 @@ def calculate_profit_endpoint(request: CropSelection):
         crop_name,
         farm_size,
         predicted_yield_acres,
-        seed_cost = request.seed_cost_per_acre,
-        fertilizer_cost = request.fertilizer_cost_per_acre,
-        labor_cost = request.labor_cost_per_acre
-        )
+        seed_cost=request.seed_cost_per_acre,
+        fertilizer_cost=request.fertilizer_cost_per_acre,
+        labor_cost=request.labor_cost_per_acre
+    )
 
+    # Ensure values are numeric
+    total_profit = float(profit["total_profit"])
+    total_revenue = float(profit["total_revenue"])
+    
     profit_margin = (
-        (profit["total_profit"] / profit["total_revenue"]) * 100
-        if profit["total_revenue"] > 0
+        (total_profit / total_revenue) * 100
+        if total_revenue > 0
         else 0
     )
 
@@ -111,9 +118,60 @@ def calculate_profit_endpoint(request: CropSelection):
         "profit": profit,
         "profit_margin": round(profit_margin, 2),
         "market_price": CROP_DATA[crop_name]["market_price"],
-        }
+    }
 
-    return{
+    return {
+        "county": county,
+        "farm_size": farm_size,
+        "crop": crop_name,
+        "profit": profit,
+        "profit_margin": round(profit_margin, 2),
+        "prediction": predicted_yield_acres,
+        "market_price": CROP_DATA[crop_name]["market_price"],
+        "cache": prediction_cache
+    }
+
+@router.post("/crop/calculate-default-profit")
+def calculate_default_profit(request: CropSelectionDefault):
+    """Calculate profit using default/AI-optimized costs"""
+    cache = prediction_cache.get('latest')
+    crop_name = prediction_cache.get("profit_analysis", {}).get("crop")
+    
+    if not cache:
+        return {"error": "No previous prediction found. Run /crop/predict-yield first."}
+
+    county = cache["county"]
+    farm_size = cache["farm_size"]
+    predictions = cache["predictions"]
+
+    # Get crop from cache or use first available
+    
+    if crop_name not in predictions:
+        return {"error": f"No prediction found for {crop_name}."}
+
+    predicted_yield_acres = predictions[crop_name]["prediction_in_acres"]
+
+    # Use default costs from CROP_DATA
+    profit = calculate_profit(
+        crop_name,
+        farm_size,
+        predicted_yield_acres,
+        # No custom costs - uses defaults from calculate_profit
+    )
+
+    total_profit = float(profit["total_profit"])
+    total_revenue = float(profit["total_revenue"])
+    profit_margin = (total_profit / total_revenue * 100) if total_revenue > 0 else 0
+
+    prediction_cache["profit_analysis"] = {
+        "crop": crop_name,
+        "predicted_yield": predicted_yield_acres,
+        "profit": profit,
+        "profit_margin": round(profit_margin, 2),
+        "market_price": CROP_DATA[crop_name]["market_price"],
+    }
+
+    return {
         "county": county,
         "farm_size": farm_size,
         "crop": crop_name,

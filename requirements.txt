@@ -8,3 +8,5 @@ plotly
 datetime
 scikit-learn
 pathlib
+fastapi
+pydantic
