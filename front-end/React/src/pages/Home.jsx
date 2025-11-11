@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../supabaseClient"; // added
 
 const Home = () => {
   const [county, setCounty] = useState("");
   const [farmSize, setFarmSize] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
 
   const handleSubmit = async () => {
     if (!county || !farmSize) {
@@ -15,20 +17,54 @@ const Home = () => {
 
     setLoading(true);
     try {
+      // get current user
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        alert("Please sign in before saving farm details.");
+        setLoading(false);
+        return;
+      }
+
+      const payload = {
+        county: county,
+        farm_size: parseFloat(farmSize),
+      };
+
+      // save to backend prediction endpoint
       const response = await fetch("http://127.0.0.1:8000/api/crop/predict-yield", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          county: county,
-          farm_size: parseFloat(farmSize),
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
 
-      // ✅ Navigate to Recommendation page with results
-      navigate("/recommendation", { state: { result: data['data'] }});
+      // save farm to supabase 'farms' table — include user_id to satisfy RLS
+      try {
+        const { data: insertData, error: insertError } = await supabase
+          .from("farms")
+          .insert([
+            {
+              county: county,
+              farm_size: parseFloat(farmSize),
+              user_id: user.id, // <-- ensure this column exists in farms table
+            },
+          ]);
 
+        if (insertError) {
+          console.warn("Failed to save farm record:", insertError);
+        } else {
+          console.log("Saved farm record:", insertData);
+        }
+      } catch (dbErr) {
+        console.warn("Supabase insert error:", dbErr);
+      }
+
+      // Navigate to Recommendation page with results
+      navigate("/recommendation", { state: { result: data["data"] }});
     } catch (err) {
       console.error(err);
       alert("Failed to connect to backend.");
@@ -36,6 +72,7 @@ const Home = () => {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center bg-[#f2f0ef] animate-fade-in">
@@ -90,4 +127,3 @@ const Home = () => {
 };
 
 export default Home;
-

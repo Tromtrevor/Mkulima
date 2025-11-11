@@ -21,7 +21,7 @@ const LogInPage = () => {
         "password": password,
       });
       if (error) setError(error.message);
-      else navigate("/home");
+      else navigate("/dashboard");
     } catch (err) {
       console.error(err);
       setError("Unexpected error occurred.");

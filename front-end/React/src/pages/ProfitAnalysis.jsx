@@ -1,38 +1,116 @@
-
 import { useNavigate, useLocation } from "react-router-dom";
 import "./custom_css/onemorestep.css";
+import { supabase } from "../supabaseClient";
+import { useState } from "react";
 
 const AnalysisResults = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const analysis = location.state?.result.cache.profit_analysis;
+  const analysis = location.state?.result?.cache?.profit_analysis || {};
+  const latest = location.state?.result?.cache?.latest || {};
   const crop = location.state?.crop;
   const county = location.state?.county;
-  const farm_size = location.state?.farm_size;   
+  const farm_size = location.state?.farm_size;
 
-  const handleProceed = () => {
-    navigate("/report");
+  const [saving, setSaving] = useState(false);
+
+  // Save prediction to Supabase then navigate to report
+// ...existing code...
+  // Save prediction to Supabase then navigate to report
+  const handleProceed = async () => {
+    setSaving(true);
+    try {
+      // get signed-in user (supabase-js v2)
+      const {
+        data: { user },
+        error: getUserError,
+      } = await supabase.auth.getUser();
+
+      if (getUserError) {
+        console.warn("Failed to get user:", getUserError);
+      }
+
+      // 1) Create a new farm row to generate farm_id
+      let farmId = null;
+      try {
+        const farmRow = {
+          county: county ?? latest?.county ?? null,
+          farm_size: farm_size ?? latest?.farm_size ?? null,
+          user_id: user?.id ?? null, // include user id to satisfy RLS if required
+        };
+
+        const { data: farmData, error: farmError } = await supabase
+          .from("farms")
+          .insert([farmRow])
+          .select("id")
+          .single();
+
+        if (farmError) {
+          console.warn("Failed to create farm record:", farmError);
+        } else {
+          farmId = farmData.id;
+          console.log("Created farm id:", farmId);
+        }
+      } catch (err) {
+        console.warn("Error creating farm record:", err);
+      }
+
+      // 2) Insert prediction referencing the new farm_id
+      const payload = {
+        crop: analysis?.crop ?? crop ?? null,
+        predicted_yield: analysis?.predicted_yield ?? null,
+        input_summary: JSON.stringify(latest?.input_data ?? {}),
+        market_price: analysis?.market_price ?? null,
+        profit_margin: analysis?.profit_margin ?? null,
+        farm_id: farmId,
+        user_id: user.id, // include user id to satisfy RLS if required
+      };
+
+      // Remove null/undefined keys so insert is clean
+      Object.keys(payload).forEach((k) => {
+        if (payload[k] === undefined || payload[k] === null) delete payload[k];
+      });
+
+      const { data: insertData, error: insertError } = await supabase
+        .from("predictions")
+        .insert([payload]);
+
+      if (insertError) {
+        console.warn("Failed to save prediction:", insertError);
+      } else {
+        console.log("Saved prediction:", insertData);
+      }
+    } catch (err) {
+      console.error("Error saving prediction:", err);
+    } finally {
+      setSaving(false);
+      // navigate to report page (report page will fetch insight from backend)
+      navigate("/report", { state: { result: location.state?.result, crop, county, farm_size } });
+    }
   };
+// ...existing code...
 
   const handleBack = () => {
     navigate(-1);
   };
 
   const handleMoreInfo = () => {
-    navigate("/farm-inputs", {state: {
+    navigate("/farm-inputs", {
+      state: {
         county: county,
         farm_size: farm_size,
         crop: crop,
-        useDefaults: true } }); // ✅ goes back to inputs if user wants to adjust
+        useDefaults: true,
+      },
+    }); // ✅ goes back to inputs if user wants to adjust
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex flex-col items-center px-5 py-8 animate-fade-in">
-      
       {/* Header Section */}
       <div className="w-full max-w-md bg-white/80 shadow-xl rounded-2xl p-6 mb-6 animate-fade-up">
         <div className="flex items-center mb-4">
-          <button 
+          <button
             onClick={handleBack}
             className="mr-3 text-green-700 hover:text-green-900 transition-colors text-2xl"
           >
@@ -69,7 +147,7 @@ const AnalysisResults = () => {
         <div className="text-center">
           <div className="text-gray-700 font-semibold mb-2">Estimated Revenue</div>
           <div className="text-2xl font-bold text-green-600 mb-1">
-            KSh {analysis.profit.total_revenue?.toLocaleString() || "00,000"}
+            KSh {analysis.profit?.total_revenue?.toLocaleString() || "00,000"}
           </div>
           <div className="text-xs text-gray-500">(Based on current market prices)</div>
         </div>
@@ -80,7 +158,7 @@ const AnalysisResults = () => {
         <div className="text-center">
           <div className="text-gray-700 font-semibold mb-2">Estimated Cultivation Cost</div>
           <div className="text-2xl font-bold text-red-600 mb-1">
-            KSh {analysis.profit.total_cost?.toLocaleString() || "00,000"}
+            KSh {analysis.profit?.total_cost?.toLocaleString() || "00,000"}
           </div>
           <div className="text-xs text-gray-500">(Based on your inputs)</div>
         </div>
@@ -94,7 +172,7 @@ const AnalysisResults = () => {
             <div>
               <div className="text-white font-semibold text-sm">Net Profit</div>
               <div className="text-2xl font-bold text-white">
-                KSh {analysis.profit.total_profit?.toLocaleString() || "00,000"}
+                KSh {analysis.profit?.total_profit?.toLocaleString() || "00,000"}
               </div>
             </div>
           </div>
@@ -115,9 +193,10 @@ const AnalysisResults = () => {
       <div className="w-full max-w-md animate-fade-up">
         <button
           onClick={handleProceed}
+          disabled={saving}
           className="green-btn w-full py-3 font-semibold text-white rounded-lg shadow-md transition-transform hover:scale-105"
         >
-          GENERATE REPORT
+          {saving ? "Saving..." : "GENERATE REPORT"}
         </button>
       </div>
 

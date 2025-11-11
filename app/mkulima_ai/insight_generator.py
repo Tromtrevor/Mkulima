@@ -18,10 +18,10 @@ def generate_crop_insight(data):
     Average Temperature (Min): {latest['input_data']['mean Tmin']} °C
     Average Temperature (Max): {latest['input_data']['mean Tmax']} °C    
     
-    Predicted Yield: {data.get('profit_analysis')['predicted_yield']} t/acre
-    Market Price: KES {data.get('profit_analysis')['market_price']} per bag
-    Estimated Profit: KES {data.get('profit_analysis')['profit']['total_profit']}
-    Profit Margin: {data.get('profit_analysis')['profit_margin']}%
+    Predicted Yield: {profit_analysis['predicted_yield']} t/acre
+    Market Price: KES {profit_analysis['market_price']} per bag
+    Estimated Profit: KES {profit_analysis['profit']['total_profit']}
+    Profit Margin: {profit_analysis['profit_margin']}%
 
     Provide analysis in valid JSON format with these exact keys:
     {{
@@ -37,10 +37,10 @@ def generate_crop_insight(data):
     Guidelines:
     - Keep all text SHORT and PRACTICAL for farmers
     - Recommendations should be actionable
-    - Suggest intercropping if farm size allows (>{data.get('latest')['farm_size']} acres)
+    - Suggest intercropping if farm size allows (>{latest['farm_size']} acres)
     - Consider N-P-K levels for intercrop suggestions
     - Warnings should highlight risks
-    - Best practices should be region-specific to {data.get('latest')['county']}
+    - Best practices should be region-specific to {latest['county']}
     - Use local context and Kenyan agricultural practices
     - Response MUST be valid JSON only, no markdown or extra text
     """

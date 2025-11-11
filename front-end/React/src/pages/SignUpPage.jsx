@@ -24,36 +24,47 @@ const SignUpPage = () => {
     }
 
     try {
-      console.log("Attempting signup...");
-      
-      const { data, error } = await supabase.auth.signUp({
+      // create auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            username: username
-          }
-        }
+            username: username,
+          },
+        },
       });
 
-      if (error) {
-        console.error("Supabase error:", error);
-        throw error;
+      if (authError) throw authError;
+
+      const userId = authData?.user?.id ?? null;
+
+      // insert profile row into "users" table (name -> username, email -> email)
+      const userRow = { name: username, email };
+      if (userId) userRow.id = userId; // include auth id if you use it as PK
+
+      const { data: insertData, error: insertError } = await supabase
+        .from("users")
+        .insert([userRow]);
+
+      if (insertError) {
+        // keep signup success but inform user that profile save failed
+        console.warn("Failed to save profile to users table:", insertError);
+        setError("Account created but failed to save profile. Please contact support.");
+      } else {
+        console.log("Saved profile:", insertData);
       }
 
-
-
-      console.log("Signup successful:", data);
       alert("✅ Account created! Check your email for verification link.");
       navigate("/login");
-      
     } catch (err) {
       console.error("Sign-up error:", err);
-      setError(err.message || "Unexpected error occurred.");
+      setError(err?.message || "Unexpected error occurred.");
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-yellow-300 to-green-100 animate-fade-in p-4">

@@ -9,6 +9,7 @@ import LogInPage from "./pages/LogInPage";
 import SidebarMenu from "./components/SidebarMenu";
 import AnalysisResults from "./pages/ProfitAnalysis";
 import Report from "./pages/Report";
+import Dashboard from "./pages/Dashboard";
 
 
 function Layout({ children }) {
@@ -32,6 +33,7 @@ function App() {
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LogInPage />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/home" element={<Home />} />
           <Route path="/recommendation" element={<Recommendation />} />
           <Route path="/selection" element={<OneMoreStep />} />

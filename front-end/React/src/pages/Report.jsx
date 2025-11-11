@@ -1,6 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./custom_css/onemorestep.css";
+import { supabase } from "../supabaseClient";
+// ...existing code...
 
 export default function Report() {
   const navigate = useNavigate();
@@ -21,6 +23,67 @@ export default function Report() {
 
         const data = await response.json();
         setReportData(data);
+
+        // --- save AI message to ai_chats table ---
+        try {
+          // get signed-in user
+          const {
+            data: { user },
+            error: getUserError,
+          } = await supabase.auth.getUser();
+
+          if (getUserError) {
+            console.warn("supabase getUser error:", getUserError);
+          }
+
+          // determine farm_id from several possible places
+          let farmId =
+            location.state?.farm_id ??
+            location.state?.result?.cache?.latest?.farm_id ??
+            data?.farm_id ??
+            data?.Insights?.farm_id ??
+            null;
+
+          // if no farmId, create a farm row (use minimal info) so ai_chat can reference it
+          if (!farmId) {
+            const county = location.state?.county ?? location.state?.result?.cache?.latest?.county ?? null;
+            const farm_size = location.state?.farm_size ?? location.state?.result?.cache?.latest?.farm_size ?? null;
+            if (user?.id) {
+              const farmRow = { county, farm_size, user_id: user.id };
+              const { data: farmInsert, error: farmErr } = await supabase
+                .from("farms")
+                .insert([farmRow])
+                .select("id")
+                .single();
+              if (farmErr) {
+                console.warn("Failed to create farm for ai_chat:", farmErr);
+              } else {
+                farmId = farmInsert.id;
+              }
+            }
+          }
+
+          // prepare message: prefer concise insight, fall back to JSON string
+          const message = data?.Insights?.Insights;
+
+          const chatRow = {
+            message: message,
+            user_id: user.id,
+            farm_id: farmId,
+            context: { source: "crop_insight_endpoint" },
+          };
+
+          // remove nulls if RLS requires user_id/farm_id present
+          Object.keys(chatRow).forEach((k) => {
+            if (chatRow[k] === null || chatRow[k] === undefined) delete chatRow[k];
+          });
+
+          const { error: chatErr } = await supabase.from("ai_chats").insert([chatRow]);
+          if (chatErr) console.warn("Failed to save ai_chat:", chatErr);
+        } catch (dbErr) {
+          console.warn("ai_chats save error:", dbErr);
+        }
+        // --- end save ---
       } catch (err) {
         console.error("Error:", err);
         setError(err.message);
@@ -30,7 +93,9 @@ export default function Report() {
     };
 
     fetchInsight();
-  }, []);
+  }, [location]);
+
+
 
   const handleDownloadPDF = () => alert("PDF download feature coming soon!");
   const handleShare = () => alert("Share feature coming soon!");

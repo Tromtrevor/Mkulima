@@ -4,6 +4,12 @@ from app.api.routes import recommend_crop
 
 app = FastAPI(title="MkuliMa API")
 
+#Front-end requests
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173"
+]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # or ["http://localhost:5173", "http://127.0.0.1:5173"]
