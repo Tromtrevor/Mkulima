@@ -69,12 +69,8 @@ const Recommendation = () => {
                 {item.crop}
               </h2>
               <p className="text-gray-700 text-sm">
-                <span className="font-semibold">Expected Yield (ha): </span>
-                {item.prediction_in_ha}
-              </p>
-              <p className="text-gray-700 text-sm">
-                <span className="font-semibold">Expected Yield (acres): </span>
-                {item.prediction_in_acres}
+                <span className="font-semibold">Expected Yield: </span>
+                {item.prediction_in_acres} t/acre
               </p>
               <p className="text-gray-700 text-sm">
                 <span className="font-semibold">Market Price: </span>

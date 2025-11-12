@@ -1,6 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import "./custom_css/onemorestep.css";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL
+
 export default function OneMoreStep() {
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -8,7 +10,7 @@ export default function OneMoreStep() {
   const crop = chosenCrop.crop;
   const handleDefault = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/crop/calculate-default-profit", {
+      const response = await fetch(`${API_BASE}/api/crop/calculate-default-profit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json" },

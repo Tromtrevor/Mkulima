@@ -3,6 +3,8 @@ import "./custom_css/onemorestep.css";
 import { supabase } from "../supabaseClient";
 import { useState } from "react";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 export default function AnalysisResults() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,7 +45,7 @@ const handleProceed = async () => {
     ]);
 
     // 2️⃣ Fetch AI insight report
-    const response = await fetch("http://127.0.0.1:8000/api/crop/insight", {
+    const response = await fetch(`${API_BASE}/api/crop/insight`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });

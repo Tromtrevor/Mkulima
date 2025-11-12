@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./custom_css/onemorestep.css";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL
+
 const FarmInputs = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,7 +53,7 @@ const FarmInputs = () => {
         fertilizer_cost_per_acre: parseFloat(inputs.fertilizer_cost_acre),
       });
 
-      const response = await fetch("http://127.0.0.1:8000/api/crop/calculate-own-profit", {
+      const response = await fetch(`${API_BASE}/api/crop/calculate-own-profit`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json"},

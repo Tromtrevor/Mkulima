@@ -12,6 +12,7 @@ import Report from "./pages/Report";
 import Dashboard from "./pages/Dashboard";
 import Reports from "./pages/Reports";
 import ChatBot from "./pages/Chatbot";
+import Information from "./pages/Information";
 
 
 function Layout({ children }) {
@@ -36,6 +37,7 @@ function App() {
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LogInPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/information" element={<Information />} />
           <Route path="/home" element={<Home />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/recommendation" element={<Recommendation />} />

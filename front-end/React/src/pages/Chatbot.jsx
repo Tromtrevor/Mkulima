@@ -4,6 +4,8 @@ import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
 import "./custom_css/onemorestep.css";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 export default function Chatbot() {
   const navigate = useNavigate();
   const [input, setInput] = useState("");
@@ -72,7 +74,7 @@ export default function Chatbot() {
       const payload = { message: text, history };
 
       // Call backend AI
-      const resp = await fetch("http://127.0.0.1:8000/api/crop/ai-chat", {
+      const resp = await fetch(`${API_BASE}/api/crop/ai-chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -7,7 +7,8 @@ app = FastAPI(title="MkuliMa API")
 #Front-end requests
 origins = [
     "http://localhost:5173",
-    "http://127.0.0.1:5173"
+    "http://127.0.0.1:5173",
+    "http://192.168.100.8:5173"
 ]
 
 app.add_middleware(
