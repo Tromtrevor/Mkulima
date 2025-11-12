@@ -36,10 +36,26 @@ export default function Reports() {
 
     fetchReports();
   }, []);
+  
+  const openReport = async () => {
+    const { data: Data } = await supabase
+        .from("farms")
+        .select("id")
+        .order("date_generated", { ascending: false })
+        .limit(1);
 
-  const openReport = (report) => {
+    const farmId = Data?.[0]?.id;
+    
+    const {data: reportData} = await supabase
+        .from("ai_chats")
+        .select("message")
+        .eq("farm_id", farmId)
+
+    const Report = reportData?.[0]?.message
+    
+
     // navigate to report page, pass the prediction row as reportData
-    navigate("/report", { state: { reportData: report } });
+    navigate("/report", { state: { reportData: Report } });
   };
 
   if (loading) {

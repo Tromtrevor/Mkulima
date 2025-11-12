@@ -95,6 +95,36 @@ export default function Report() {
             </div>
           </div>
         )}
+
+        {data.market_trends && (
+          <div className="market-trends bg-white rounded-lg shadow-md p-8 mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Market Trends</h2>
+            <p className="text-gray-700 leading-relaxed mb-4">{data.market_trends}</p>
+          </div>
+        )}
+
+        {Array.isArray(data.best_practices) && data.best_practices.length > 0 && (
+          <div className="best-practices bg-blue-50 rounded-lg shadow-md p-8 mb-8 border-l-4 border-blue-400">
+            <h2 className="text-2xl font-bold text-blue-800 mb-6">Best Practices</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {data.best_practices.map((practice, idx) => (<div key={idx} className="bg-white p-4 rounded-lg shadow-sm"><p className="text-gray-700 leading-relaxed">{practice}</p></div>))}
+            </div>
+          </div>
+        )}
+
+        {data.roi_info && (
+          <div className="roi-info bg-green-50 rounded-lg shadow-md p-8 mb-8 border-l-4 border-[#229e47]">
+            <h2 className="text-2xl font-bold text-green-800 mb-4">ROI Information</h2>
+            <p className="text-gray-700 leading-relaxed">{data.roi_info}</p>
+          </div>
+        )}
+
+        {data.notes && (
+          <div className="additional-notes bg-gray-50 rounded-lg shadow-md p-8 mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Additional Notes</h2>
+            <p className="text-gray-700 leading-relaxed">{data.notes}</p>
+          </div>
+        )}
       </div>
 
       <div className="button-section flex flex-col gap-4 max-w-md mx-auto mb-8 animate-fade-up mt-8">
