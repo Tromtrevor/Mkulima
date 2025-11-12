@@ -1,9 +1,45 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../supabaseClient";
 import "./custom_css/onemorestep.css";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [reportCount, setReportCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchReportCount = async () => {
+      try {
+        setLoading(true);
+        // get signed-in user
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
+
+        const userId = userData?.user?.id;
+        if (!userId) {
+          setReportCount(0);
+          return;
+        }
+
+        // fetch predictions count for that user
+        const { count, error } = await supabase
+          .from("predictions")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", userId);
+
+        if (error) throw error;
+        setReportCount(count || 0);
+      } catch (err) {
+        console.error("Error fetching report count:", err);
+        setReportCount(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReportCount();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex justify-center items-start py-10 px-5 animate-fade-in">
@@ -11,7 +47,7 @@ export default function Dashboard() {
         {/* Header / Welcome Section */}
         <div className="relative bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl p-5 text-center shadow-md">
           <h1 className="text-2xl font-extrabold tracking-wide">
-            Welcome, MKULIMA 🌿
+            Welcome, MkuliMa 🌿
           </h1>
           <p className="text-sm opacity-90 mt-1">
             Your smart agri companion for insights and analysis
@@ -37,7 +73,11 @@ export default function Dashboard() {
             </svg>
           </div>
           <div className="text-4xl font-extrabold text-gray-800 text-center">
-            0
+            {loading ? (
+              <span className="text-gray-400 text-lg">Loading...</span>
+            ) : (
+              reportCount
+            )}
           </div>
           <button
             onClick={() => navigate("/reports")}
@@ -47,7 +87,6 @@ export default function Dashboard() {
           </button>
         </div>
 
-
         {/* AI Chat & Announcements */}
         <div className="grid grid-cols-2 gap-4">
           {/* AI Chat */}
@@ -55,7 +94,7 @@ export default function Dashboard() {
             <div>
               <h3 className="text-gray-800 font-bold mb-2">AI Chat</h3>
               <p className="text-gray-600 text-xs">
-                Chat and get instant answers using our AI Agri assistant.
+                Chat and get instant answers using MkuliMa assistant.
               </p>
             </div>
             <button

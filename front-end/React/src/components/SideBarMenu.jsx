@@ -26,7 +26,7 @@ const SidebarMenu = () => {
   const menuItems = [
     { icon: <Menu className="w-5 h-4" />, label: "Dashboard", path: "/dashboard" },
     { icon: <BookText className="w-5 h-4" />, label: "Reports", path: "/reports" },
-    { icon: <Info className="w-5 h-4" />, label: "Information", path: "/information" },
+    { icon: <Info className="w-5 h-4" />, label: "InforMation", path: "/information" },
     { icon: <MapPin className="w-5 h-4" />, label: "AgroMap", path: "/agromap" },
     { icon: <NotebookText className="w-5 h-4" />, label: "About Us", path: "/about-us" },
     { icon: <MessageCircleQuestionMark className="w-5 h-4" />, label: "FAQ", path: "/faq" },
@@ -56,7 +56,7 @@ const SidebarMenu = () => {
         <div className="flex items-center justify-center space-x-2 p-5 border-b border-green-200">
           {isOpen && (
             <h1 className="text-green-700 font-extrabold text-xl tracking-wide">
-              MKULIMA
+              MkuliMa
             </h1>
           )}
         </div>
@@ -106,7 +106,7 @@ const SidebarMenu = () => {
         {/* Footer */}
         {isOpen && (
           <div className="text-center text-green-700 font-bold text-sm mb-4">
-            © 2025 MKULIMA
+            © 2025 MkuliMa
           </div>
         )}
       </div>
