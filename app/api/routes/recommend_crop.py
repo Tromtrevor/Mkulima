@@ -1,7 +1,7 @@
 # app/api/routes/data.py
 from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import Optional 
+from typing import Optional, List, Dict
 from ...current_data.current_data import fetch_realtime_data
 from ...profit_calculation.profit_calc import calculate_profit, CROP_DATA
 from ...mkulima_ai.insight_generator import generate_crop_insight
@@ -37,6 +37,7 @@ class CropSelectionDefault(BaseModel):
 
 class ChatRequest(BaseModel):
     message: str
+    history: List[Dict] = []
 
 @router.post("/crop/predict-yield")
 def predict_yield(request: CropRequest):
@@ -192,11 +193,23 @@ def crop_insight():
 
 @router.post("/crop/ai-chat")
 def chat_endpoint(request: ChatRequest):
+    # System prompt
     messages = [
-        {"role": "system", "content": "You are MkuliMA, an expert agronomist AI assistant helping Kenyan farmers with crop planning, soil health, and profitability, part of the Mkulima app."},
-        {"role": "user", "content": request.message}
+        {
+            "role": "system",
+            "content": "You are MkuliMA, an expert agronomist AI assistant helping Kenyan farmers with crop planning, soil health, and profitability, part of the Mkulima app."
+        }
     ]
 
+    # Add chat history
+    for entry in request.history:
+        messages.append({"role": "user", "content": entry.get("request", "")})
+        messages.append({"role": "assistant", "content": entry.get("response", "")})
+
+    # Current user message
+    messages.append({"role": "user", "content": request.message})
+
+    # Call your chatbot function
     reply = chatbot(messages)
 
     return {

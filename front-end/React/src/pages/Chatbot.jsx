@@ -1,3 +1,4 @@
+// Chatbot.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +9,7 @@ export default function Chatbot() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [chatRow, setChatRow] = useState(null); // full DB row for this user
+  const [chatRow, setChatRow] = useState(null);
   const chatEndRef = useRef(null);
 
   // Auto-scroll
@@ -20,54 +21,40 @@ export default function Chatbot() {
   useEffect(() => {
     let mounted = true;
     const fetchHistory = async () => {
-      try {
-        const { data: userData } = await supabase.auth.getUser();
-        const user = userData?.user;
-        if (!user) return;
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData?.user;
+      if (!user) return;
 
-        // get single row for this user (id == user.id)
-        const { data, error } = await supabase
-          .from("chatbot")
-          .select("id,chats")
-          .eq("id", user.id)
-          //.single();
+      const { data, error } = await supabase
+        .from("chatbot")
+        .select("id,chats")
+        .eq("id", user.id);
 
-        if (error && error.code !== "PGRST116") {
-          // ignore "No rows found" style error code, warn others
-          console.warn("Load error:", error);
-        }
+      if (error && error.code !== "PGRST116") console.warn("Load error:", error);
 
-        if (!mounted) return;
+      if (!mounted || !data) return;
 
-        if (data) {
-          setChatRow(data);
-          const chats = Array.isArray(data.chats) ? data.chats : (data.chats ? JSON.parse(data.chats) : []);
-          // flatten into message list: request then response
-          const formatted = chats.flatMap((entry) => {
-            const req = entry.request ?? entry.Request ?? entry.RequestText ?? null;
-            const res = entry.response ?? entry.Response ?? entry.ResponseText ?? null;
-            const out = [];
-            if (req != null) out.push({ role: "user", content: req, key: `r_${Math.random()}` });
-            if (res != null) out.push({ role: "assistant", content: res, key: `a_${Math.random()}` });
-            return out;
-          });
-          setMessages(formatted);
-        }
-      } catch (err) {
-        console.warn("fetchHistory error:", err);
-      }
+      setChatRow(data[0] || null);
+
+      const chats = data[0]?.chats ?? [];
+      const formatted = chats.flatMap((entry) => {
+        const out = [];
+        if (entry.request) out.push({ role: "user", content: entry.request, key: `r_${Math.random()}` });
+        if (entry.response) out.push({ role: "assistant", content: entry.response, key: `a_${Math.random()}` });
+        return out;
+      });
+      setMessages(formatted);
     };
 
     fetchHistory();
     return () => { mounted = false; };
   }, []);
 
-  // send user message, call backend, then append {request,response} to chats column on user's row
+  // Send message
   const handleSend = async () => {
     const text = input.trim();
     if (!text) return;
     setInput("");
-    // optimistic UI: show user message immediately
     setMessages((prev) => [...prev, { role: "user", content: text, key: `u_${Date.now()}` }]);
     setLoading(true);
 
@@ -80,54 +67,47 @@ export default function Chatbot() {
         return;
       }
 
-      // call backend AI
+      // Prepare chat history for AI
+      const history = chatRow?.chats ?? [];
+      const payload = { message: text, history };
+
+      // Call backend AI
       const resp = await fetch("http://127.0.0.1:8000/api/crop/ai-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify(payload),
       });
+
       const result = await resp.json();
-      const aiText = result?.reply ?? result?.message ?? JSON.stringify(result);
+      const aiText = result?.reply ?? "No response";
 
-      // build new chat entry
+      // Save in Supabase
       const newEntry = { request: text, response: aiText };
+      const updatedChats = [...history, newEntry];
 
-      if (chatRow && chatRow.id) {
-        // existing row: append to chats array and update
-        const existingChats = Array.isArray(chatRow.chats) ? chatRow.chats : (chatRow.chats ? JSON.parse(chatRow.chats) : []);
-        const updatedChats = [...existingChats, newEntry];
-
+      if (chatRow?.id) {
         const { data: updated, error: updateErr } = await supabase
           .from("chatbot")
           .update({ chats: updatedChats })
           .eq("id", chatRow.id)
-          .select()
-          //.single();
+          .select();
 
-        if (updateErr) {
-          console.warn("Failed to update chatbot row:", updateErr);
-        } else {
-          setChatRow(updated);
-        }
+        if (updateErr) console.warn("Update error:", updateErr);
+        else setChatRow(updated[0]);
       } else {
-        // no row yet: insert new row with id = user.id and chats = [newEntry]
         const { data: inserted, error: insertErr } = await supabase
           .from("chatbot")
           .insert([{ id: user.id, chats: [newEntry] }])
-          .select()
-          .single();
+          .select();
 
-        if (insertErr) {
-          console.warn("Failed to insert chatbot row:", insertErr);
-        } else {
-          setChatRow(inserted);
-        }
+        if (insertErr) console.warn("Insert error:", insertErr);
+        else setChatRow(inserted[0]);
       }
 
-      // append AI reply to UI
+      // Append AI reply locally
       setMessages((prev) => [...prev, { role: "assistant", content: aiText, key: `a_${Date.now()}` }]);
     } catch (err) {
-      console.error("AI fetch error:", err);
+      console.error(err);
       setMessages((prev) => [...prev, { role: "assistant", content: "⚠️ Failed to reach AI." }]);
     } finally {
       setLoading(false);
@@ -149,7 +129,7 @@ export default function Chatbot() {
           messages.map((msg, i) => (
             <div key={msg.key ?? i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
               <div className={`p-3 rounded-2xl shadow-md max-w-xs md:max-w-md ${msg.role === "user" ? "bg-[#229e47] text-white rounded-br-none" : "bg-white text-gray-800 rounded-bl-none"}`}>
-                <div className="whitespace-pre-wrap break-words">{typeof msg.content === "object" ? JSON.stringify(msg.content) : msg.content}</div>
+                <div className="whitespace-pre-wrap break-words">{msg.content}</div>
               </div>
             </div>
           ))
