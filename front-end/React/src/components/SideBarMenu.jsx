@@ -8,6 +8,7 @@ import {
   LogOut,
   BookText,
   Menu,
+  CircleChevronRight,
   X,
   Info,
   Bell,
@@ -23,8 +24,8 @@ const SidebarMenu = () => {
   const [isOpen, setIsOpen] = useState(true);
 
   const menuItems = [
-    { icon: <Bell className="w-5 h-4" />, label: "Notifications", path: "/notifications" },
-    { icon: <BookText className="w-5 h-4" />, label: "Reports", path: "/report" },
+    { icon: <Menu className="w-5 h-4" />, label: "Dashboard", path: "/dashboard" },
+    { icon: <BookText className="w-5 h-4" />, label: "Reports", path: "/reports" },
     { icon: <Info className="w-5 h-4" />, label: "Information", path: "/information" },
     { icon: <MapPin className="w-5 h-4" />, label: "AgroMap", path: "/agromap" },
     { icon: <NotebookText className="w-5 h-4" />, label: "About Us", path: "/about-us" },
@@ -42,7 +43,7 @@ const SidebarMenu = () => {
         onClick={() => setIsOpen(!isOpen)}
         className="lg:hidden fixed top-4 left-4 z-50 bg-green-600 text-white p-2 rounded-lg shadow-lg focus:outline-none hover:bg-green-700 transition-all"
       >
-        {isOpen ? <X size={20} /> : <Menu size={20} />}
+        {isOpen ? <X size={20} /> : <CircleChevronRight size={20} />}
       </button>
 
       {/* Sidebar */}
