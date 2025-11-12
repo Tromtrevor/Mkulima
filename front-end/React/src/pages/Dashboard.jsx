@@ -40,7 +40,7 @@ export default function Dashboard() {
             0
           </div>
           <button
-            onClick={() => navigate("/report")}
+            onClick={() => navigate("/reports")}
             className="mt-4 w-full green-btn hover:scale-105 transition-all"
           >
             View Reports
@@ -113,7 +113,7 @@ export default function Dashboard() {
             GET RECOMMENDATION
           </button>
         </div>
-        
+
         {/* Info Note */}
         <p className="text-center text-gray-500 text-xs italic mt-6 animate-fade-up">
           Use this dashboard to navigate and explore all features. Your smart

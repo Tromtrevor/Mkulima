@@ -32,7 +32,7 @@ const handleProceed = async () => {
 
     await supabase.from("predictions").insert([
       {
-        crop: crop.crop,
+        crop: crop,
         predicted_yield: analysis.predicted_yield,
         input_summary: latest.input_data,
         market_price: analysis.market_price,
@@ -50,7 +50,7 @@ const handleProceed = async () => {
 
     if (!response.ok) throw new Error("Failed to fetch crop insight");
     const data = await response.json();
-    const message = data?.Insights?.Insights || data?.Insights || data;
+    const message = data.Insights.Insights;
 
     // 3️⃣ Save AI message
     await supabase.from("ai_chats").insert([

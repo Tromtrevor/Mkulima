@@ -8,7 +8,7 @@ const FarmInputs = () => {
   const result = location.state?.result;
   
 
-  const crop = location.state?.crop.crop;
+  const crop = location.state?.crop;
   const county = location.state?.county;
   const farm_size = location.state?.farm_size;  
   // Get data from location.state - fix the destructuring

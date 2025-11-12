@@ -5,7 +5,7 @@ export default function OneMoreStep() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { county, farm_size, chosenCrop } = state || {};
-
+  const crop = chosenCrop.crop;
   const handleDefault = async () => {
     try {
       const response = await fetch("http://127.0.0.1:8000/api/crop/calculate-default-profit", {
@@ -13,7 +13,7 @@ export default function OneMoreStep() {
         headers: {
           "Content-Type": "application/json" },
         body: JSON.stringify({
-          crop_name: chosenCrop.crop,
+          crop_name: crop,
         }),
       });
 
@@ -23,7 +23,7 @@ export default function OneMoreStep() {
       navigate("/profit", {
         state: {
           result: data,
-          crop: chosenCrop,
+          crop: crop,
           county: county,
           farm_size: farm_size,
         },

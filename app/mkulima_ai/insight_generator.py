@@ -70,8 +70,8 @@ def generate_crop_insight(data):
             "insight": response.choices[0].message.content,
             "recommendations": [],
             "warnings": [],
-            "market_trends": "Market data unavailable",
+            "market_trends": [],
             "best_practices": [],
-            "roi_info": "ROI data unavailable",
+            "roi_info": [],
             "notes": ""
         }
