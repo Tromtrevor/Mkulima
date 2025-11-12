@@ -50,7 +50,7 @@ const Home = () => {
             {
               county: county,
               farm_size: parseFloat(farmSize),
-              user_id: user.id, // <-- ensure this column exists in farms table
+              user_id: user.id,
             },
           ]);
 

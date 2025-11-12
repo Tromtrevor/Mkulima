@@ -87,7 +87,7 @@ const FarmInputs = () => {
       // Navigate to profit analysis page with results
       navigate("/profit", { 
         state: { 
-          result: data, // Handle both response formats
+          result: data,
           crop: crop,
           county: county,
           farm_size: farm_size,
