@@ -98,7 +98,7 @@ export default function Dashboard() {
               </p>
             </div>
             <button
-              onClick={() => navigate("/chat")}
+              onClick={() => navigate("/chatbot")}
               className="text-green-600 text-sm font-semibold mt-3 hover:underline"
             >
               Start Chat →

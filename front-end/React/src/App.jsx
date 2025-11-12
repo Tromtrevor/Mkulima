@@ -11,6 +11,7 @@ import AnalysisResults from "./pages/ProfitAnalysis";
 import Report from "./pages/Report";
 import Dashboard from "./pages/Dashboard";
 import Reports from "./pages/Reports";
+import ChatBot from "./pages/Chatbot";
 
 
 function Layout({ children }) {
@@ -42,6 +43,7 @@ function App() {
           <Route path="/farm-inputs" element={<FarmInputs />} />
           <Route path="/profit" element={<AnalysisResults />} />
           <Route path="/report" element={<Report />} />
+          <Route path="/chatbot" element={<ChatBot />} />
           {/* Catch all route for undefined paths */}
           {/*<Route path="*" element={<Navigate to="/home" replace />} />*/}
         </Routes>
